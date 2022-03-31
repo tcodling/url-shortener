@@ -7,6 +7,16 @@ let urls = [];
 let short_urls = [];
 let i = 0;
 
+function isValidHttpUrl(string) {
+    let url;
+    try {
+        url = new URL(string);
+    } catch (_) {
+        return false;  
+    }
+    return url.protocol === "http:" || url.protocol === "https:";
+}
+
 // Basic Configuration
 const port = process.env.PORT || 3000;
 
@@ -26,7 +36,8 @@ app.get('/api/hello', function(req, res) {
 });
 
 app.post('/api/shorturl', (req, res) => {
-    const short_url = i
+    if (isValidHttpUrl(req.body.url)) {
+      const short_url = i
     i++
     short_urls.push(short_url)
     urls.push(req.body.url)
@@ -34,6 +45,9 @@ app.post('/api/shorturl', (req, res) => {
         original_url: req.body.url,
         short_url: short_url
     });
+    } else {
+      res.json({error: 'invalid url'})
+    }
 })
 
 app.get('/api/shorturl/:id', (req, res) => {
